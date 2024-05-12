@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 use stronghold_utils::GuardDebug;
 use zeroize::Zeroizing;
 
+/// The primary procedures for the [`Es256k`] algorithm.
 #[derive(Clone, GuardDebug, Serialize, Deserialize)]
 pub enum Es256Procs {
     GenerateKey(GenerateKey),
@@ -22,22 +23,28 @@ pub enum Es256Procs {
     Verify(Verify),
 }
 
+/// Returns a Es256 public key from an already existing private key in the vault.
 #[derive(Clone, GuardDebug, Serialize, Deserialize)]
 pub struct PublicKey {
     pub private_key: Location,
 }
 
+/// Generates a random Es256 private key and stores it in the vault at the supplied [`Location`].
 #[derive(Clone, GuardDebug, Serialize, Deserialize)]
 pub struct GenerateKey {
     pub output: Location,
 }
 
+/// Signs a message using the indicated private key from the vault.
 #[derive(Clone, GuardDebug, Serialize, Deserialize)]
 pub struct Sign {
     pub msg: Vec<u8>,
     pub private_key: Location,
 }
 
+/// Verifies that a message was signed by the indicated private key in the vault.
+/// Generates a new public key to preform this verification. The public key is discarded.
+/// Returns 1 if the signature is valid, 0 otherwise.
 #[derive(Clone, GuardDebug, Serialize, Deserialize)]
 pub struct Verify {
     pub msg: Vec<u8>,

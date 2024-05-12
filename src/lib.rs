@@ -1,3 +1,8 @@
+// This is a library that extends the iota_stronghold library to allow user-defined cryptographic algorithms.
+// This library also includes its own implementations of the es256 and es256k algorithms.
+mod ext;
+pub use ext::{execute_procedure_chained_ext, execute_procedure_ext, ProcedureExt};
+
 #[cfg(feature = "crypto")]
 use thiserror::Error as DeriveError;
 
@@ -10,9 +15,6 @@ pub use crypto::{
 };
 #[cfg(feature = "crypto")]
 mod procs;
-
-mod ext;
-pub use ext::{execute_procedure_chained_ext, execute_procedure_ext, ProcedureExt};
 
 // Error types for the crypto module.
 #[cfg(feature = "crypto")]
