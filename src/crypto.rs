@@ -3,6 +3,9 @@ use std::{borrow::Cow, num::NonZeroUsize};
 pub mod es256;
 pub mod es256k;
 
+///  A trait for interfacing with cryptographic signatures.  
+///
+/// Provides a uniform interface to move from one backend to another.
 pub trait AlgoSignature: Sized {
     const LENGTH: Option<NonZeroUsize>;
 
@@ -11,6 +14,10 @@ pub trait AlgoSignature: Sized {
     fn as_bytes(&self) -> Cow<'_, [u8]>;
 }
 
+/// The main trait for manipulating cryptographic algorithms.
+///
+/// Follows a simple interface for generating, signing and verifying signatures with
+/// a crytographic algorithm.
 pub trait Algorithm {
     type SigningKey;
     type VerifyingKey;
@@ -33,6 +40,12 @@ pub trait Algorithm {
         message: &[u8],
     ) -> bool;
 }
+
+/// Verifying key for a specific signature cryptosystem. In the case of public-key cryptosystems,
+/// this is a public key.
+///
+/// This trait provides a uniform interface for different backends / implementations
+/// of the same cyptosystem.
 pub trait VerifyingKey<T>: Sized
 where
     T: Algorithm<VerifyingKey = Self>,

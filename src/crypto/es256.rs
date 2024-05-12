@@ -37,12 +37,16 @@ impl Algorithm for Es256 {
         Self::SigningKey::random(&mut rand::thread_rng())
     }
 
+    /// Signs a message with a `SigningKey` (private key) and returns a `Signature`.
+    /// Using Sha256 as the digest to hash the message before signing as per the es256 spec.
     fn sign(&self, signing_key: &Self::SigningKey, message: &[u8]) -> Self::Signature {
         let mut digest = Sha256::default();
         digest.update(message);
         signing_key.sign_digest(digest)
     }
 
+    /// Verifies a signature given a message and a `VerifyingKey`.
+    /// Uses Sha256 as the digest to hash the message before verifying as per the es256 spec.
     fn verify_signature(
         &self,
         signature: &Self::Signature,
@@ -61,6 +65,7 @@ impl SKey<Es256> for SigningKey {
         Ok(Self::from_slice(raw)?)
     }
 
+    /// Returns a `VerifyingKey` aka a public key from the private key.
     fn to_verifying_key(&self) -> VerifyingKey {
         *self.verifying_key()
     }
@@ -71,10 +76,16 @@ impl SKey<Es256> for SigningKey {
 }
 
 impl VKey<Es256> for VerifyingKey {
+    /// Takes a slice of bytes in sec1 format and returns a `VerifyingKey`.
+    ///
+    /// Sec1format is a format where the first byte indicates the type of key.
     fn from_slice(raw: &[u8]) -> crate::Result<Self> {
         Ok(Self::from_sec1_bytes(raw)?)
     }
 
+    /// Serializes the key to a compressed encoded point format.  Will include a leading byte indicating the type of key.
+    ///
+    /// Should maybe expose the ability to change whether or not the key is compressed.
     fn as_bytes(&self) -> Cow<'_, [u8]> {
         let bytes = self.to_encoded_point(true).as_bytes().to_vec();
         Cow::Owned(bytes)
