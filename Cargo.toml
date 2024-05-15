@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["<Tensor>", "<tensordeveloper@gmail.com>"]
 
 [features]
-default = []
+default = ["crypto"]
 crypto = [
     "dep:p256",
     "dep:k256",
