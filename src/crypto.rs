@@ -26,6 +26,9 @@ pub trait Algorithm {
     /// Returns the name of this algorithm.
     fn name(&self) -> Cow<'static, str>;
 
+    /// Returns the name of the curve used by this algorithm.
+    fn curve(&self) -> Cow<'static, str>;
+
     /// Generates a new random signing key.
     fn generate_signing_key(&self) -> Self::SigningKey;
 

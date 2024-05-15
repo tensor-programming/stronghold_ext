@@ -33,6 +33,10 @@ impl Algorithm for Es256 {
         Cow::Borrowed("ES256")
     }
 
+    fn curve(&self) -> Cow<'static, str> {
+        Cow::Borrowed("P-256")
+    }
+
     fn generate_signing_key(&self) -> Self::SigningKey {
         Self::SigningKey::random(&mut rand::thread_rng())
     }

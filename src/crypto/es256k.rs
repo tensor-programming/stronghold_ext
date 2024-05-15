@@ -57,6 +57,10 @@ where
         Cow::Borrowed("ES256K")
     }
 
+    fn curve(&self) -> Cow<'static, str> {
+        Cow::Borrowed("K-256")
+    }
+
     fn generate_signing_key(&self) -> Self::SigningKey {
         Self::SigningKey::random(&mut rand::thread_rng())
     }
