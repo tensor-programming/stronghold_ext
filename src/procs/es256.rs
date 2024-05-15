@@ -185,16 +185,25 @@ impl Procedure for Es256Procs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use iota_stronghold::Stronghold;
+    use iota_stronghold::{KeyProvider, SnapshotPath, Stronghold};
 
     use crate::{execute_procedure_chained_ext, execute_procedure_ext};
+
+    static STRONGHOLD_CLIENT_PATH: &[u8] = b"iota_identity_client";
 
     #[test]
     fn test_es256_procs() {
         let stronghold = Stronghold::default();
-        let client = stronghold.create_client(b"test_es256_procs").unwrap();
 
-        let sk_loc = Location::generic(b"secret_key".to_vec(), b"record".to_vec());
+        let client_path = "./multi-key-stronghold.bin".to_owned();
+
+        let snapshot_path = SnapshotPath::from_path(client_path.clone());
+        let key_provider = KeyProvider::with_passphrase_hashed_blake2b(b"sup3rSecr3t".to_vec())
+            .expect("failed to load key");
+
+        let client = stronghold.create_client("iota_identity_client").unwrap();
+
+        let sk_loc = Location::generic(b"iota_identity_vault".to_vec(), b"key-1".to_vec());
 
         let gen_key = Es256Procs::GenerateKey(GenerateKey {
             output: sk_loc.clone(),
@@ -238,5 +247,16 @@ mod tests {
             .unwrap();
 
         assert_eq!(res[0], 1);
+
+        // Set the work factor to 10 to speed up the commit.
+        engine::snapshot::try_set_encrypt_work_factor(10).unwrap();
+
+        stronghold
+            .write_client(STRONGHOLD_CLIENT_PATH)
+            .expect("store client state into snapshot state failed");
+
+        stronghold
+            .commit_with_keyprovider(&snapshot_path, &key_provider)
+            .expect("stronghold could not commit");
     }
 }

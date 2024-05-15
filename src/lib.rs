@@ -13,7 +13,7 @@ mod crypto;
 pub use crypto::{
     es256::Es256, es256k::Es256k, AlgoSignature, Algorithm, SigningKey, VerifyingKey,
 };
-#[cfg(feature = "crypto")]
+// #[cfg(feature = "crypto")]
 pub mod procs;
 
 // Error types for the crypto module.
