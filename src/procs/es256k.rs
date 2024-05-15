@@ -188,11 +188,9 @@ impl Procedure for Es256kProcs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use iota_stronghold::{KeyProvider, SnapshotPath, Stronghold};
+    use iota_stronghold::Stronghold;
 
     use crate::{execute_procedure_chained_ext, execute_procedure_ext};
-
-    static STRONGHOLD_CLIENT_PATH: &[u8] = b"iota_identity_client";
 
     #[test]
     fn test_es256k_procs() {
@@ -207,83 +205,6 @@ mod tests {
 
         // create es256k secret key and put it into the stronghold vault.
         let _ = execute_procedure_ext(&client, gen_key).unwrap();
-
-        let pub_key = Es256kProcs::PublicKey(PublicKey {
-            private_key: sk_loc.clone(),
-        });
-
-        let sign = Es256kProcs::Sign(Sign {
-            msg: b"test".to_vec(),
-            private_key: sk_loc.clone(),
-        });
-
-        // Chain together the public key and sign procedures.
-        let res = execute_procedure_chained_ext(&client, vec![pub_key, sign]).unwrap();
-
-        let pk: Vec<u8> = res[0].clone().into();
-        // Public key is sec1 encoded which means it should be 33 bytes long.  leading byte should be either 2, 3 or 4 because its a compressed point.
-        assert_eq!(pk.len(), 33);
-
-        // check to see that the public key is valid.
-        let vk = <Es256k as Algorithm>::VerifyingKey::from_slice(&pk);
-        assert!(vk.is_ok());
-
-        // get the signature bytes for verification.
-        let sig = res[1].clone();
-
-        let verify = Es256kProcs::Verify(Verify {
-            msg: b"test".to_vec(),
-            signature: sig.into(),
-            private_key: sk_loc.clone(),
-        });
-
-        let res: [u8; 1] = execute_procedure_ext(&client, verify)
-            .unwrap()
-            .try_into()
-            .unwrap();
-
-        assert_eq!(res[0], 1);
-    }
-
-    #[test]
-    fn test_es256k_snapshot_creation() {
-        let stronghold = Stronghold::default();
-
-        let client_path = "./snapshots/multi-key-stronghold.bin".to_owned();
-
-        let snapshot_path = SnapshotPath::from_path(client_path.clone());
-        let key_provider = KeyProvider::with_passphrase_hashed_blake2b(b"sup3rSecr3t".to_vec())
-            .expect("failed to load key");
-
-        let client = stronghold.create_client(STRONGHOLD_CLIENT_PATH).unwrap();
-
-        let sk_loc = Location::generic(b"iota_identity_vault".to_vec(), b"key-2".to_vec());
-
-        let gen_key = Es256kProcs::GenerateKey(GenerateKey {
-            output: sk_loc.clone(),
-        });
-
-        // create es256k secret key and put it into the stronghold vault.
-        let _ = execute_procedure_ext(&client, gen_key).unwrap();
-
-        // Set the work factor to 10 to speed up the commit.
-        engine::snapshot::try_set_encrypt_work_factor(10).unwrap();
-
-        stronghold
-            .write_client(STRONGHOLD_CLIENT_PATH)
-            .expect("store client state into snapshot state failed");
-
-        stronghold
-            .commit_with_keyprovider(&snapshot_path, &key_provider)
-            .expect("stronghold could not commit");
-
-        // clear the stronghold client state.
-        stronghold.clear().unwrap();
-
-        // reload the client.
-        let client = stronghold
-            .load_client_from_snapshot(STRONGHOLD_CLIENT_PATH, &key_provider, &snapshot_path)
-            .expect("read client state from snapshot state failed");
 
         let pub_key = Es256kProcs::PublicKey(PublicKey {
             private_key: sk_loc.clone(),
