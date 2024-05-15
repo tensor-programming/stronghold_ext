@@ -244,7 +244,7 @@ mod tests {
     }
 
     #[test]
-    fn test_es256k_snapshot_creation() {
+    fn test_es256_snapshot_creation() {
         let stronghold = Stronghold::default();
 
         let client_path = "./snapshots/multi-key-stronghold.bin".to_owned();
