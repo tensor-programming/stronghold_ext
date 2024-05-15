@@ -24,7 +24,7 @@ mod snapshot_test {
         let es256k_loc = Location::generic(b"iota_identity_vault".to_vec(), b"key-1".to_vec());
 
         let es256_loc: Location =
-            Location::generic(b"iota_identity_vault".to_vec(), b"key-1".to_vec());
+            Location::generic(b"iota_identity_vault".to_vec(), b"key-2".to_vec());
 
         let gen_key = Es256kProcs::GenerateKey(es256k::GenerateKey {
             output: es256k_loc.clone(),
