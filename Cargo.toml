@@ -20,9 +20,9 @@ crypto = [
 
 [dependencies]
 thiserror = "1.0"
-iota_stronghold = { git = "https://github.com/iotaledger/stronghold.rs", branch = "2.0" }
-stronghold-utils = { git = "https://github.com/iotaledger/stronghold.rs", branch = "2.0", optional = true }
-stronghold_engine = { git = "https://github.com/iotaledger/stronghold.rs", branch = "2.0", optional = true }
+iota_stronghold = "2.1"
+stronghold-utils = { version = "1.0", optional = true }
+stronghold_engine = { version = "2.0", optional = true }
 
 p256 = { version = "0.13", optional = true, features = ["ecdsa"] }
 k256 = { version = "0.13", optional = true, features = ["ecdsa"] }
